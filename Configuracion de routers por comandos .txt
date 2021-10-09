@@ -281,6 +281,6 @@ Branch3(config-if)# ppp authentication chap
 Para crear un mensaje de banner del día en un dispositivo de red, use el comando de configuración global banner motd # el mensaje del día #. El símbolo “#” en la sintaxis del comando se denomina carácter delimitador. Se ingresa antes y después del mensaje.
 
 	Sw-Floor-1# configure terminal
-	Sw-Floor-1(config)# banner motd # el mensaje del día #
+	Sw-Floor-1(config)# banner motd #En esta parte del mensaje inicia y termina con el simbolo de "#" NO olvidarse de esto#
 
 
