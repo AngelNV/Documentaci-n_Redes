@@ -1,0 +1,286 @@
+*********************Configurar una vlan
+Switch#conf t
+Switch(config)#vlan 10
+Switch(config-vlan)#name sistemas
+Switch(config)#vlan 20
+Switch(config-vlan)#name ventas
+Switch(config-vlan)#vlan 30
+Switch(config-vlan)#name compras
+Switch(config)#end
+Switch#
+Switch#show vlan
+----------------------------------------	Configuración de interfaz virtual de switch  VLAN
+
+La Vlan 1 no es una interfaz física real, sino una virtual. A continuación, asigne una IPv4 mediante el comando ip address ip-address subnet-mask de la dirección de configuración de interfaz. Finalmente, habilite la interfaz virtual utilizando el comando de no shutdown configuración de la interfaz.
+
+Sw-Floor-1# configure terminal
+Sw-Floor-1(config)# interface vlan 1
+Sw-Floor-1(config-if)# ip address 192.168.1.20 255.255.255.0
+Sw-Floor-1(config-if)# no shutdown
+Sw-Floor-1(config-if)# exit
+Sw-Floor-1(config)# ip default-gateway 192.168.1.1
+
+
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4
+                                                Fa0/5, Fa0/6, Fa0/7, Fa0/8
+                                                Fa0/9, Fa0/10, Fa0/11, Fa0/12
+                                                Fa0/13, Fa0/14, Fa0/15, Fa0/16
+                                                Fa0/17, Fa0/18, Fa0/19, Fa0/20
+                                                Fa0/21, Fa0/22, Fa0/23, Fa0/24
+10   sistemas                         active    
+20   ventas                           active    
+30   compras                          active    
+
+******************************* Implementacion de VLAN
+Switch#conf t
+Switch(config)#interface fastEthernet 0/3
+Switch(config-if)#switchport mode access 
+Switch(config-if)#switchport access vlan 10
+Switch(config-if)#end
+
+************************	 Configuracion principal/contraseña
+Router>enable
+Router#conf term
+Enter configuration commands, one per line. End with CNTL/Z.
+Router(config)#line vty 0 4
+Router(config-line)#password cisco
+Router(config-line)#login
+Router(config-line)#exit
+Router(config)#line con 0
+Router(config-line)#password cisco
+Router(config-line)#login
+Router(config-line)#exit
+Router(config)#enable secret cisco
+
+
+************************	Etherneth
+Router>enable
+Router#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#interface GigabitEthernet0/0
+Router(config-if)#ip address 192.168.2.1 255.255.255.0
+Router(config-if)#no shutdown
+Router(config-if)#
+
+
+************************	Seriales
+Router>enable
+Router#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#interface Serial0/0/1
+Router(config-if)#ip address 192.168.23.1 255.255.255.252
+Router(config-if)#no shutdown
+
+Recargar un router
+Router# reload
+
+*************	Para verificar la configuración que se acaba de introducir. 
+
+Router>enable
+Router#
+Router#show running-config
+
+*************************	Mensaje en Routers
+
+Router>en
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#banner motd # Solo personal autorizado #
+
+
+
+*********************Borrar y recargar el router 
+Router>en
+Router#conf t
+Router#erase startup-config
+La petición de la línea de respuesta será:
+Erasing the nvram filesystem will remove all files! Continue?
+[confirm]
+Presione Intro para confirmar.
+La respuesta deberá ser:
+Erase of nvram: complete
+En el modo EXEC privilegiado, introduzca el comando reload (recargar).
+Router#reload
+La petición de la línea de respuesta será:
+System configuration has been modified. Save? [yes/no]:
+Escriba n y luego presione Intro.
+La petición de la línea de respuesta será:
+Proceed with reload? [confirm]
+Presione Intro para confirmar.
+La primera línea de la respuesta será:
+Reload requested by console.
+Una vez que el router se ha recargado el mensaje de respuesta será:
+Would you like to enter the initial configuration dialog? [yes/no]:
+Escriba n y luego presione Intro.
+La petición de la línea de respuesta será:
+Press RETURN to get started!
+Presione Intro.
+El router está listo para que iniciar la práctica de laboratorio asignada. 
+
+
+***************Evitar que los mensajes logging molesten
+Router(config)#line con 0
+Router(config-line)#logging synchronous
+Router(config)#line aux 0
+Router(config-line)#logging synchronous
+Router(config)#line vty 0 4
+Router(config-line)#logging synchronous
+
+
+
+
+******************** configuración de reloj
+Router>en
+Password: 
+Router#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#
+Router(config)#interface Serial0/0/1
+Router(config-if)#clock rate [tiempo]128000
+
+-------------------------------------------Configuración mediante OSPF
+
+*****************************************	Configurar OSPF
+
+
+Router(config)#router ospf 1
+		++++ lOS NETWORK SON CONFOMRME A SUS REDES ++++
+Router(config-router)#net
+Router(config-router)#network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)#network 192.168.12.0 0.0.0.3 area 0
+Router(config-router)#network 192.168.13.0 0.0.0.3 area 0
+Router(config-router)#exit
+Router(config)#
+
+
+
+-------------------------------------
+++++++++++++++++	show ip protocols 
+verificar información fundamental de configuración de OSPF 
+la ID del proceso OSPF
+ la ID del router,
+ las redes que anuncia el router,
+ los vecinos de los que el router recibe actualizaciones
+ la distancia administrativa predeterminada, que para OSPF es 110
+
++++++++++++++++++++	show ip ospf neighbor
+ verificar si el router formó una adyacencia con los routers vecinos. 
+Muestra la ID del router vecino, 
+la prioridad del vecino, 
+el estado de OSPF, 
+el temporizador de tiempo muerto, 
+la dirección IP de la interfaz vecina
+y la interfaz mediante la cual se puede acceder al vecino.
+
++++++++++++++++++++++	show ip ospf interface 
+ mostrar los parámetros de OSPF que se configuraron en una interfaz
+ como la ID del proceso OSPF a la que se asignó la interfaz, 
+el área en la que están las interfaces,
+ el costo de la interfaz 
+ los intervalos de saludo y muerto. Si se agrega el nombre y el número de interfaz al comando, se muestra el resultado para una interfaz específica.
+
++++++++++++++++++++++	show ip ospf 
+se utiliza para examinar la ID del proceso OSPF y la ID del router.
+este comando muestra información de área OSPF y la última vez que se calculó el algoritmo SPF.
+
+++++++++++++++++++++	show ip route ospf 
+se utiliza para mostrar solo las rutas OSPF descubiertas en la tabla de routing. 
+ mediante OSPF.
+
+++++++++++++++++++	clear ip ospf [ id-proceso ] process: se usa para restablecer las adyacencias de vecinos OSPFv2
+
++++++++++++++++++	verificacion de OSPF 
+Router#show ip ospf neighbor 
+
+++++++++++++++++++++++++	verificar la configuración del protocolo OSPF.
+El comando show ip protocols es una manera rápida de verificar información fundamental de configuración
+de OSPF
+
+Router#show ip protocols 
+
+++++++++++++++++++++++++	verificar la información del proceso OSPF
+Use el comando show ip ospf para examinar la ID del proceso OSPF y la ID del router muestra información de área OSPF y la última vez que se calculó el algoritmo SPF.
+
+R1# show ip ospf
+
+*****************  Cambie las ID de router con direcciones de loopback. 
+R1(config)# interface lo0
+R1(config-if)# ip address 1.1.1.1 255.255.255.255
+R1(config-if)# end
+
+
+
+************************* Recargar un router
+Router# reload
+Nota: es posible que reciba un mensaje para guardar la configuración en ejecución antes de volver a cargar el router. Responda escribiendo no y presione Entrar.
+System configuration has been modified. Save? [yes/no]: no
+
+
+
+
+********************* Omita el diálogo de configuración inicial.
+Una vez que se vuelve a cargar el router, se le solicita introducir el diálogo de configuración inicial. Escriba no y presione Entrar.
+	Would you like to enter the initial configuration dialog? [yes/no]: no
+	Se le solicitará que finalice el programa de instalación automática. Responda yes (sí) y, luego, presione Entrar.
+Would you like to terminate autoinstall? [yes]: yes
+	*************Inicializar el switch y volver a cargar
+Paso 1: Conéctese al switch.
+Switch> enable
+
+************************** Copia de router
+
+Router#copy running-config startup-config
+Destination filename [startup-config]? startup-config
+Building configuration...
+[OK]
+Router#
+
+//////////Dirección del archivo 
+dir nvram:
+
+/////////////////////////	Desactivar DNS	
+
+Router>enable
+Router#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router(config)#no ip domain-lookup
+
+
+
+**************************	Configurar loopback 
+
+Router(config)# interface loopback[Colocar un numero]
+
+Router(config-if)# ip address ip-address subnet-mask
+
+Router(config-if)# exit
+
+
+************************** Mostrar la encapsulación serial predeterminada. 
+En los routers, emita el comando show interfaces serial [id-interfaz] para mostrar la encapsulación serial actual. 
+Branch1# show interfaces s0/0/0
+
++++++++++++++++++	Cambiar la encapsulación serial a PPP. 
+a. Emita el comando encapsulation ppp en la interfaz S0/0/0 para que el router Branch1 cambie la encapsulación de HDLC a PPP. 
+Branch1(config)# interface s0/0/0
+
++++++++++++++++++++++++++	Configure un nombre de usuario para la autenticación CHAP.
+Central(config)# username [nombre] password cisco
+
+
++++++++++++++++++++++++		Configure la interfaz S0/0/1 en [Nombredel dispositivo]Branch3 para la autenticación CHAP.
+Branch3(config)# interface s0/0/1
+Branch3(config-if)# ppp authentication chap
+
+
+
+***************************** 	Mensajes de aviso
+Para crear un mensaje de banner del día en un dispositivo de red, use el comando de configuración global banner motd # el mensaje del día #. El símbolo “#” en la sintaxis del comando se denomina carácter delimitador. Se ingresa antes y después del mensaje.
+
+	Sw-Floor-1# configure terminal
+	Sw-Floor-1(config)# banner motd # el mensaje del día #
+
+
